@@ -1,5 +1,7 @@
-package me.hydos.rosella.graph;
+package me.hydos.rosella.graph.nodes;
 
+import me.hydos.rosella.graph.GraphInstance;
+import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.resources.Resource;
 import me.hydos.rosella.graph.resources.ResourceDependency;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +17,7 @@ public abstract class GraphNode {
     /**
      * The graph that this node is attached to.
      */
-    protected final GraphInstance graph;
+    public final GraphInstance graph;
 
     /**
      *
@@ -25,17 +27,6 @@ public abstract class GraphNode {
     protected GraphNode(@NotNull RenderGraph graph) {
         this.graph = graph.addNode(this);
     }
-
-    /**
-     * Returns all resources that this node provides.
-     *
-     * This list must not change during the lifetime of the graph.
-     *
-     * @return All resources provided by this node.
-     */
-    public abstract Set<Resource> getProvidedResources();
-
-    public abstract Set<ResourceDependency> getDependentResources();
 
     /**
      * Returns true if this node is a anchor node.

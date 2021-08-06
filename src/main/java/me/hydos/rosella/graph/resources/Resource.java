@@ -1,6 +1,6 @@
 package me.hydos.rosella.graph.resources;
 
-import me.hydos.rosella.graph.GraphNode;
+import me.hydos.rosella.graph.nodes.GraphNode;
 
 /**
  * Represents data passed between nodes in a graph.

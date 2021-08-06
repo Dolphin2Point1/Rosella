@@ -1,6 +1,6 @@
 package me.hydos.rosella.graph.resources;
 
-import me.hydos.rosella.graph.GraphNode;
+import me.hydos.rosella.graph.nodes.GraphNode;
 
 /**
  *
@@ -24,4 +24,12 @@ public abstract class ResourceDependency {
      * @return True if this dependency is satisfied.
      */
     public abstract boolean isSatisfied();
+
+    /**
+     * @param other The resource to compare to
+     * @return True if the resource is part of the same graph as this dependency
+     */
+    public boolean isInSameGraph(Resource other) {
+        return other.sourceNode.graph == this.node.graph;
+    }
 }

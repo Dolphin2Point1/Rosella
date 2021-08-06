@@ -1,7 +1,7 @@
 package me.hydos.rosella.graph.resources;
 
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import me.hydos.rosella.graph.GraphNode;
+import me.hydos.rosella.graph.nodes.GraphNode;
 
 import java.util.Set;
 

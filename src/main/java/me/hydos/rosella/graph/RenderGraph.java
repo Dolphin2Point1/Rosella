@@ -1,5 +1,7 @@
 package me.hydos.rosella.graph;
 
+import me.hydos.rosella.graph.nodes.GraphNode;
+
 /**
  *
  */
@@ -15,5 +17,5 @@ public abstract class RenderGraph {
      * @param node The node to add
      * @return The graph instance that the node should use for graph operations
      */
-    protected abstract GraphInstance addNode(GraphNode node);
+    public abstract GraphInstance addNode(GraphNode node);
 }

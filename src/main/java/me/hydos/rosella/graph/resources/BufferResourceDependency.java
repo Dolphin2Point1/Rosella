@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.resources;
 
-import me.hydos.rosella.graph.GraphNode;
+import me.hydos.rosella.graph.IllegalGraphStateException;
+import me.hydos.rosella.graph.nodes.GraphNode;
 
 public class BufferResourceDependency extends ResourceDependency {
 
@@ -26,6 +27,10 @@ public class BufferResourceDependency extends ResourceDependency {
      * @param source The new source
      */
     protected void setDependency(BufferResource source) {
+        if(source != null && !isInSameGraph(source)) {
+            throw new IllegalGraphStateException("Tried to depend on a resource in a different graph");
+        }
+
         synchronized (this) {
             if(dependency != null) {
                 dependency.removeDependency(this);

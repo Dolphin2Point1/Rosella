@@ -27,7 +27,7 @@ public class BufferResourceDependency extends ResourceDependency {
      * @param source The new source
      */
     protected void setDependency(BufferResource source) {
-        if(source != null && !isInSameGraph(source)) {
+        if(source != null && isInDifferentGraph(source)) {
             throw new IllegalGraphStateException("Tried to depend on a resource in a different graph");
         }
 

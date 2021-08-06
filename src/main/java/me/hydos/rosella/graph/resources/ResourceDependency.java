@@ -27,7 +27,7 @@ public abstract class ResourceDependency {
 
     /**
      * @param other The resource to compare to
-     * @return True if the resource is part of the same graph as this dependency
+     * @return True if the resource is not part of the same graph as this dependency
      */
     public boolean isInDifferentGraph(Resource other) {
         return other.sourceNode.graph != this.node.graph;

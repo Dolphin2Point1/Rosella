@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
+import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitNode;
 import me.hydos.rosella.graph.resources.Resource;
 import me.hydos.rosella.graph.resources.DependantResource;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * A node is the basic building block of render graphs.
  * They represent operations that should be performed on resources.
  */
-public abstract class GraphNode {
+public abstract class GraphNode implements OneTimeSubmitNode {
 
     private static final AtomicLong nextID = new AtomicLong(1);
 
@@ -77,16 +78,16 @@ public abstract class GraphNode {
     public void destroy() {
     }
 
-    public List<Resource> getAllResources() {
-        return List.of();
-    }
+    public abstract List<Resource> getAllResources();
 
-    public List<DependantResource> getAllDependencies() {
-        return List.of();
-    }
+    public abstract List<DependantResource> getAllDependencies();
 
     @Override
     public int hashCode() {
         return Objects.hash(this.id); // TODO faster?
+    }
+
+    public void otsInit() {
+        throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
     }
 }

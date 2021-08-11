@@ -1,8 +1,11 @@
 package me.hydos.rosella.graph.one_time_submit;
 
+import me.hydos.rosella.graph.GraphEngine;
 import me.hydos.rosella.graph.resources.*;
 
-public interface OTSResourceInfo {
+public interface OneTimeSubmitProcessInfo {
+
+    GraphEngine getGraphEngine();
 
     /**
      * Determines the specification of a buffer resource. The resource must have been resolved before this function

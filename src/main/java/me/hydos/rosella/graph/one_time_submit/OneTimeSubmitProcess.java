@@ -43,6 +43,8 @@ public class OneTimeSubmitProcess implements Runnable {
             completedFuture.cancel(true);
             this.graph.destroy();
 
+            throw ex;
+
         } finally {
             this.graph.unlock();
         }

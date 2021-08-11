@@ -5,7 +5,7 @@ import me.hydos.rosella.graph.resources.*;
 /**
  *
  */
-public interface OTSScanInfo extends OneTimeSubmitProcessInfo {
+public interface OTSScanPhase extends OneTimeSubmitProcessInfo {
 
     /**
      * Resolves the spec of a buffer resource.

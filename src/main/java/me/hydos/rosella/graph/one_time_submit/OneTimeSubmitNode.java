@@ -19,8 +19,19 @@ public interface OneTimeSubmitNode {
      * A node must resolve all of its resources using the provided info. Not resolving any resource will cause
      * compilation to fail.
      *
-     * @param info
+     * @param phase
      * @return The execution requirements of the node.
      */
-    OTSNodeExecutionRequirements otsScan(OTSScanInfo info);
+    OTSNodeExecutionRequirements otsScan(OTSScanPhase phase);
+
+    /**
+     * Called during the record phase of a one time submit process.
+     *
+     * After this function returns a node must be in a state such that it can be abandoned without calling its destroy
+     * function and does not leak any resources. State that needs to persist after this function can be added to the
+     * provided configuration object.
+     */
+    void otsRecord();
+
+
 }

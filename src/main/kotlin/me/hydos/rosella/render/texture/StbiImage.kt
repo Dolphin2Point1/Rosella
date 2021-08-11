@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.texture
 
-import me.hydos.rosella.Rosella
+import me.hydos.rosella.LegacyRosella
 import me.hydos.rosella.render.resource.Resource
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
@@ -27,7 +27,7 @@ class StbiImage(byteBuffer: ByteBuffer, private val format: ImageFormat) : Uploa
                     throw RuntimeException("Failed to load texture image. Expected channel count (${format.channels}) did not match returned channel count (${pChannels[0]})")
                 }
             } else {
-                Rosella.LOGGER.warn("Failed to load image properly! Falling back to loading raw pixel data.")
+                LegacyRosella.LOGGER.warn("Failed to load image properly! Falling back to loading raw pixel data.")
                 pixels = byteBuffer
             }
 

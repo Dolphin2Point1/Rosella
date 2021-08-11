@@ -1,8 +1,8 @@
 package me.hydos.rosella.render.shader
 
-import me.hydos.rosella.Rosella
+import me.hydos.rosella.LegacyRosella
 
-class ShaderManager(val rosella: Rosella) {
+class ShaderManager(val rosella: LegacyRosella) {
 
     var cachedShaders = HashMap<RawShaderProgram, ShaderProgram>()
 

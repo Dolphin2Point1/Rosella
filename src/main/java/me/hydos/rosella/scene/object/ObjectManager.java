@@ -1,6 +1,6 @@
 package me.hydos.rosella.scene.object;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.render.material.Material;
 import me.hydos.rosella.render.renderer.Renderer;
 import me.hydos.rosella.render.shader.RawShaderProgram;
@@ -18,7 +18,7 @@ public interface ObjectManager {
      * @param pass    the current render pass
      * @param rosella the instance of the engine.
      */
-    void rebuildCmdBuffers(RenderPass pass, Rosella rosella, Renderer renderer);
+    void rebuildCmdBuffers(RenderPass pass, LegacyRosella rosella, Renderer renderer);
 
     /**
      * adds an object into the current scene.

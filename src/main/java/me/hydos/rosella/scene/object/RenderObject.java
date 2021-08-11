@@ -1,6 +1,6 @@
 package me.hydos.rosella.scene.object;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.memory.ManagedBuffer;
 import me.hydos.rosella.memory.Memory;
@@ -79,7 +79,7 @@ public class RenderObject implements Renderable {
     }
 
     @Override
-    public void onAddedToScene(Rosella rosella) {
+    public void onAddedToScene(LegacyRosella rosella) {
         instanceInfo = new InstanceInfo(new RenderObjectUbo(rosella.common.device, rosella.common.memory, this, material.getShader()), material);
         renderInfo = CompletableFuture.completedFuture(new RenderInfo(
                 rosella.bufferManager.getOrCreateVertexBuffer(new ManagedBuffer<>(vertexBuffer, true)),
@@ -94,12 +94,12 @@ public class RenderObject implements Renderable {
         try {
             renderInfo.get().free(device, memory);
         } catch (InterruptedException | ExecutionException e) {
-            Rosella.LOGGER.error("Error freeing render info", e);
+            LegacyRosella.LOGGER.error("Error freeing render info", e);
         }
     }
 
     @Override
-    public void rebuild(Rosella rosella) {
+    public void rebuild(LegacyRosella rosella) {
         instanceInfo.rebuild(rosella);
     }
 

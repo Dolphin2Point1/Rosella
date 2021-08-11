@@ -1,5 +1,6 @@
 package me.hydos.rosella.vkobjects;
 
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.debug.LegacyDebugCallback;
 import me.hydos.rosella.init.InitializationRegistry;
 import me.hydos.rosella.init.InstanceBuilder;
@@ -21,7 +22,7 @@ import static org.lwjgl.vulkan.VK10.*;
 import static org.lwjgl.vulkan.VK12.VK_API_VERSION_1_2;
 
 /**
- * {@link me.hydos.rosella.Rosella} representation of a {@link VkInstance}. Contains a couple of useful things here and there and does most of the work for you.
+ * {@link LegacyRosella} representation of a {@link VkInstance}. Contains a couple of useful things here and there and does most of the work for you.
  */
 @Deprecated
 public class LegacyVulkanInstance {
@@ -114,7 +115,7 @@ public class LegacyVulkanInstance {
      * Gets the required Extensions needed depending on what is being used
      *
      * @param useValidation       if true, an extra validation lay
-     * @param requestedExtensions extensions requested by {@link me.hydos.rosella.Rosella} based on user choice and necessity
+     * @param requestedExtensions extensions requested by {@link LegacyRosella} based on user choice and necessity
      * @return a {@link PointerBuffer} created from the {@link List}
      */
     private PointerBuffer getRequiredExtensions(boolean useValidation, List<String> requestedExtensions) {

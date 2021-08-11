@@ -1,6 +1,6 @@
 package me.hydos.rosella.file.model;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.render.Topology;
 import me.hydos.rosella.render.material.Material;
 import me.hydos.rosella.render.material.state.StateInfo;
@@ -31,11 +31,11 @@ public class GlbModelLoader {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static List<GlbRenderObject> createGlbRenderObject(Rosella rosella, Resource glbFile, ShaderProgram program, NodeSelector selector, Matrix4f viewMatrix, Matrix4f projectionMatrix) {
+    public static List<GlbRenderObject> createGlbRenderObject(LegacyRosella rosella, Resource glbFile, ShaderProgram program, NodeSelector selector, Matrix4f viewMatrix, Matrix4f projectionMatrix) {
         return createGlbRenderObject(rosella, glbFile, program, selector, viewMatrix, projectionMatrix, StateInfo.DEFAULT_3D);
     }
 
-    public static List<GlbRenderObject> createGlbRenderObject(Rosella rosella, Resource glbFile, ShaderProgram program, NodeSelector selector, Matrix4f viewMatrix, Matrix4f projectionMatrix, StateInfo stateInfo) {
+    public static List<GlbRenderObject> createGlbRenderObject(LegacyRosella rosella, Resource glbFile, ShaderProgram program, NodeSelector selector, Matrix4f viewMatrix, Matrix4f projectionMatrix, StateInfo stateInfo) {
         AIScene scene = AssimpHelperKt.loadScene(glbFile, Assimp.aiProcess_FlipUVs | Assimp.aiProcess_DropNormals);
         List<AssimpMaterial> rawMaterials = new ArrayList<>();
         List<AITexture> rawTextures = new ArrayList<>();

@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.model
 
-import me.hydos.rosella.Rosella
+import me.hydos.rosella.LegacyRosella
 import me.hydos.rosella.render.material.Material
 import me.hydos.rosella.render.resource.Resource
 import me.hydos.rosella.scene.`object`.RenderObject
@@ -78,7 +78,7 @@ open class GuiRenderObject(
         this.indices.rewind()
     }
 
-    override fun onAddedToScene(rosella: Rosella) {
+    override fun onAddedToScene(rosella: LegacyRosella) {
         super.onAddedToScene(rosella)
         modelMatrix.translate(0f, 0f, z)
     }

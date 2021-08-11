@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.info;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.memory.Memory;
 import me.hydos.rosella.memory.MemoryCloseable;
@@ -25,7 +25,7 @@ public record InstanceInfo(Ubo ubo,
      *
      * @param rosella the Rosella
      */
-    public void rebuild(@NotNull Rosella rosella) {
+    public void rebuild(@NotNull LegacyRosella rosella) {
         if (ubo.getUniformBuffers().size() == 0) {
             ubo.create(rosella.renderer.swapchain);
             material.getShader().getDescriptorManager().createNewDescriptor(material.getTextures(), ubo);
@@ -37,7 +37,7 @@ public record InstanceInfo(Ubo ubo,
      *
      * @param rosella the Rosella
      */
-    public void hardRebuild(@NotNull Rosella rosella) {
+    public void hardRebuild(@NotNull LegacyRosella rosella) {
         material.getShader().getDescriptorManager().clearDescriptorSets(ubo.getDescriptors());
         ubo.free(rosella.common.device, rosella.common.memory);
 

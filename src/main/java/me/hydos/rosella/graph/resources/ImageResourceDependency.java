@@ -7,13 +7,18 @@ public class ImageResourceDependency extends ResourceDependency {
 
     private ImageResource dependency;
 
-    public ImageResourceDependency(GraphNode graphNode, ResourceAccess accessType, int stageMask, int accessMask) {
-        super(graphNode, accessType, stageMask, accessMask);
+    public ImageResourceDependency(GraphNode graphNode, ResourceAccess accessType) {
+        super(graphNode, accessType);
     }
 
     @Override
-    public boolean isSatisfied() {
-        return false;
+    public void reset() {
+        synchronized (this) {
+            if(dependency != null) {
+                dependency.removeDependency(this);
+                dependency = null;
+            }
+        }
     }
 
     /**
@@ -40,5 +45,15 @@ public class ImageResourceDependency extends ResourceDependency {
                 this.dependency = source;
             }
         }
+    }
+
+    @Override
+    public Resource getDependency() {
+        return dependency;
+    }
+
+    @Override
+    public boolean isSatisfied() {
+        return false;
     }
 }

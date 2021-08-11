@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.resource
 
-import me.hydos.rosella.Rosella
+import me.hydos.rosella.LegacyRosella
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -9,7 +9,7 @@ import java.nio.ByteBuffer
 import javax.imageio.ImageIO
 
 /**
- * Don't use this once [Rosella] get its own ResourceLoader field
+ * Don't use this once [LegacyRosella] get its own ResourceLoader field
  */
 object Global : ResourceLoader by ClassLoaderResourceLoader(ClassLoader.getSystemClassLoader()) {
 

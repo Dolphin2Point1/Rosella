@@ -1,10 +1,9 @@
 package me.hydos.rosella.scene.object.impl;
 
 import it.unimi.dsi.fastutil.Pair;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.render.info.InstanceInfo;
 import me.hydos.rosella.render.info.RenderInfo;
 import me.hydos.rosella.render.material.Material;
@@ -21,7 +20,6 @@ import me.hydos.rosella.vkobjects.VkCommon;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
@@ -31,7 +29,7 @@ public class SimpleObjectManager implements ObjectManager {
 
     public Renderer renderer;
     private final VkCommon common;
-    private final Rosella rosella;
+    private final LegacyRosella rosella;
     public final ShaderManager shaderManager;
     public final TextureManager textureManager;
     public PipelineManager pipelineManager;
@@ -40,7 +38,7 @@ public class SimpleObjectManager implements ObjectManager {
     public final List<Material> materials = new ArrayList<>();
     public final List<Material> unprocessedMaterials = new ArrayList<>();
 
-    public SimpleObjectManager(Rosella rosella, VkCommon common) {
+    public SimpleObjectManager(LegacyRosella rosella, VkCommon common) {
         this.shaderManager = new ShaderManager(rosella);
         this.textureManager = new TextureManager(common);
         this.rosella = rosella;
@@ -48,7 +46,7 @@ public class SimpleObjectManager implements ObjectManager {
     }
 
     @Override
-    public void rebuildCmdBuffers(RenderPass pass, Rosella rosella, Renderer renderer) {
+    public void rebuildCmdBuffers(RenderPass pass, LegacyRosella rosella, Renderer renderer) {
         // TODO: move to here
     }
 

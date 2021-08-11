@@ -7,14 +7,17 @@ public class BufferResourceDependency extends ResourceDependency {
 
     private BufferResource dependency = null;
 
-    public BufferResourceDependency(GraphNode graphNode, ResourceAccess accessType, int stageMask, int accessMask) {
-        super(graphNode, accessType, stageMask, accessMask);
+    public BufferResourceDependency(GraphNode graphNode, ResourceAccess accessType) {
+        super(graphNode, accessType);
     }
 
     @Override
-    public boolean isSatisfied() {
+    public void reset() {
         synchronized (this) {
-            return dependency != null;
+            if(this.dependency != null) {
+                this.dependency.removeDependency(this);
+                this.dependency = null;
+            }
         }
     }
 
@@ -26,21 +29,33 @@ public class BufferResourceDependency extends ResourceDependency {
      *
      * @param source The new source
      */
-    protected void setDependency(BufferResource source) {
+    public void setDependency(BufferResource source) {
         if(source != null && isInDifferentGraph(source)) {
             throw new IllegalGraphStateException("Tried to depend on a resource in a different graph");
         }
 
         synchronized (this) {
-            if(dependency != null) {
-                dependency.removeDependency(this);
-                dependency = null;
+            if(this.dependency != null) {
+                this.dependency.removeDependency(this);
+                this.dependency = null;
             }
 
             if(source != null) {
                 source.addDependency(this);
                 this.dependency = source;
             }
+        }
+    }
+
+    @Override
+    public BufferResource getDependency() {
+        return this.dependency;
+    }
+
+    @Override
+    public boolean isSatisfied() {
+        synchronized (this) {
+            return dependency != null;
         }
     }
 }

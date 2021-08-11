@@ -3,7 +3,7 @@ package me.hydos.rosella.memory.buffer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.ints.IntHash;
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.memory.BufferInfo;
 import me.hydos.rosella.memory.ManagedBuffer;
 import me.hydos.rosella.memory.Memory;
@@ -53,7 +53,7 @@ public class GlobalBufferManager {
     private final Int2ObjectMap<BufferInfo> indexHashToBufferMap = new Int2ObjectOpenCustomHashMap<>(PREHASHED_STRATEGY);
     private final Int2ObjectMap<AtomicInteger> indexHashToInvocationsFrameMap = new Int2ObjectOpenCustomHashMap<>(PREHASHED_STRATEGY);
 
-    public GlobalBufferManager(Rosella rosella) {
+    public GlobalBufferManager(LegacyRosella rosella) {
         this.memory = rosella.common.memory;
         this.common = rosella.common;
         this.renderer = rosella.renderer;

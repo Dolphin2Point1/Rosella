@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.device.VulkanQueues;
 import me.hydos.rosella.display.Display;
@@ -43,7 +43,7 @@ import static org.lwjgl.vulkan.VK10.*;
 public class Renderer {
 
     // Rosella instance this is owned to
-    private final Rosella rosella;
+    private final LegacyRosella rosella;
 
     // For convenience instead of rosella.common
     private final VkCommon common;
@@ -68,7 +68,7 @@ public class Renderer {
     private Map<Integer, Frame> imagesInFlight = new Int2ObjectOpenHashMap<>();
     private int currentFrameInFlight = 0;
 
-    public Renderer(Rosella rosella) {
+    public Renderer(LegacyRosella rosella) {
         this.rosella = rosella;
         this.common = rosella.common;
 
@@ -198,7 +198,7 @@ public class Renderer {
         }
     }
 
-    private void recreateSwapChain(Display window, Rosella rosella) {
+    private void recreateSwapChain(Display window, LegacyRosella rosella) {
         while (window.width == 0 || window.height == 0) {
             window.waitForNonZeroSize();
         }
@@ -396,7 +396,7 @@ public class Renderer {
                                         0
                                 );
                             } catch (InterruptedException | ExecutionException e) {
-                                Rosella.LOGGER.error("Error obtaining render info", e);
+                                LegacyRosella.LOGGER.error("Error obtaining render info", e);
                             }
                         }
 

@@ -3,7 +3,7 @@ package me.hydos.rosella.memory;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.render.material.PipelineInfo;
 import me.hydos.rosella.render.renderer.Renderer;
@@ -89,7 +89,7 @@ public abstract class Memory {
                     .device(common.device.rawDevice)
                     .pVulkanFunctions(vulkanFunctions)
                     .instance(common.vkInstance.rawInstance)
-                    .vulkanApiVersion(Rosella.VULKAN_VERSION);
+                    .vulkanApiVersion(LegacyRosella.VULKAN_VERSION);
 
             PointerBuffer pAllocator = stack.mallocPointer(1);
             Vma.vmaCreateAllocator(createInfo, pAllocator);
@@ -289,10 +289,10 @@ public abstract class Memory {
         try {
             // the time gets converted to nanos anyway, so avoid long overflow
             if (!deallocatorThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
-                Rosella.LOGGER.debug("Memory thread pool took too long to shut down");
+                LegacyRosella.LOGGER.debug("Memory thread pool took too long to shut down");
             }
         } catch (InterruptedException e) {
-            Rosella.LOGGER.debug("Error shutting down memory thread pool");
+            LegacyRosella.LOGGER.debug("Error shutting down memory thread pool");
         }
 
         destroyAllocator(allocator);

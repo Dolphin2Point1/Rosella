@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.material;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.render.Topology;
 import me.hydos.rosella.render.material.state.StateInfo;
 import me.hydos.rosella.render.resource.Resource;
@@ -9,7 +9,6 @@ import me.hydos.rosella.render.texture.*;
 import me.hydos.rosella.render.vertex.VertexFormat;
 import me.hydos.rosella.scene.object.impl.SimpleObjectManager;
 
-import static org.lwjgl.vulkan.VK10.VK_FORMAT_R8G8B8A8_SRGB;
 import static org.lwjgl.vulkan.VK10.VK_FORMAT_R8G8B8A8_UNORM;
 
 /**
@@ -53,7 +52,7 @@ public class Material {
     protected PipelineInfo pipeline;
     protected Texture[] textures;
 
-    public void loadTextures(SimpleObjectManager objectManager, Rosella rosella) { //FIXME this is also temporary
+    public void loadTextures(SimpleObjectManager objectManager, LegacyRosella rosella) { //FIXME this is also temporary
         if (resource != Resource.Empty.INSTANCE) {
             TextureManager textureManager = objectManager.textureManager;
             int textureId = textureManager.generateTextureId(); // FIXME this texture can't be removed

@@ -1,5 +1,6 @@
 package me.hydos.rosella.device;
 
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.init.DeviceBuilder;
 import me.hydos.rosella.init.InitializationRegistry;
 import me.hydos.rosella.init.VulkanInstance;
@@ -25,7 +26,7 @@ import static org.lwjgl.vulkan.KHRSwapchain.VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 import static org.lwjgl.vulkan.VK10.*;
 
 /**
- * The object which represents both a Physical and Logical device used by {@link me.hydos.rosella.Rosella}
+ * The object which represents both a Physical and Logical device used by {@link LegacyRosella}
  */
 @Deprecated
 public class LegacyVulkanDevice {

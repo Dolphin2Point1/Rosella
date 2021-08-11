@@ -12,6 +12,7 @@ public class BufferResource extends Resource {
 
     protected final BufferResourceDependency source;
     protected final Set<BufferResourceDependency> dependants = new ObjectArraySet<>();
+    protected long bufferSize;
 
     public BufferResource(GraphNode node) {
         super(node);

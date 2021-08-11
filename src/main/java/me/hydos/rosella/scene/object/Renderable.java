@@ -1,6 +1,6 @@
 package me.hydos.rosella.scene.object;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.memory.MemoryCloseable;
 import me.hydos.rosella.render.info.InstanceInfo;
 import me.hydos.rosella.render.info.RenderInfo;
@@ -13,18 +13,18 @@ import java.util.concurrent.Future;
 public interface Renderable extends MemoryCloseable {
 
     /**
-     * Called when the Application asked {@link Rosella} to add this to the scene.
+     * Called when the Application asked {@link LegacyRosella} to add this to the scene.
      *
-     * @param rosella the common fields used by {@link Rosella}
+     * @param rosella the common fields used by {@link LegacyRosella}
      */
-    void onAddedToScene(Rosella rosella);
+    void onAddedToScene(LegacyRosella rosella);
 
     /**
      * Called when the swapchain needs to be resized
      *
-     * @param rosella the instance of the {@link Rosella} engine used.
+     * @param rosella the instance of the {@link LegacyRosella} engine used.
      */
-    void rebuild(Rosella rosella);
+    void rebuild(LegacyRosella rosella);
 
     InstanceInfo getInstanceInfo();
 

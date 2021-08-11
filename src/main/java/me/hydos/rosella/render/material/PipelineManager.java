@@ -5,7 +5,7 @@ import java.nio.LongBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.render.Topology;
 import me.hydos.rosella.render.material.state.StateInfo;
@@ -65,7 +65,7 @@ public class PipelineManager {
         PipelineCreateInfo createInfo = new PipelineCreateInfo(
                 renderer.renderPass,
                 material.shader.getRaw().getDescriptorSetLayout(),
-                Rosella.POLYGON_MODE,
+                LegacyRosella.POLYGON_MODE,
                 material.shader,
                 material.topology,
                 material.vertexFormat,

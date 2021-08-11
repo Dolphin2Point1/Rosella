@@ -8,6 +8,13 @@ import me.hydos.rosella.graph.nodes.GraphNode;
 public abstract class Resource {
 
     /**
+     * Used to store metadata for the graph compile process. Provided here to avoid unnecessary lookup in a table.
+     * This is for the graph compile process and must not be touched by the application. It is expected that all
+     * resources submitted to a compile process have this value set to null.
+     */
+    public Object compileMeta = null;
+
+    /**
      * The node that provides this resource
      */
     public final GraphNode sourceNode;

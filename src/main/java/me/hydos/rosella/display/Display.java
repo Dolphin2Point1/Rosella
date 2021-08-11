@@ -1,6 +1,6 @@
 package me.hydos.rosella.display;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.vkobjects.VkCommon;
 
 import java.util.ArrayList;
@@ -36,10 +36,10 @@ public abstract class Display {
     /**
      * This method will handle looping for you, meaning you will not have to call update() every frame manually.
      */
-    public abstract void startAutomaticLoop(Rosella rosella);
+    public abstract void startAutomaticLoop(LegacyRosella rosella);
 
     /**
-     * Exit's the {@link Display}. should be called after {@link Rosella} exit's
+     * Exit's the {@link Display}. should be called after {@link LegacyRosella} exit's
      */
     public abstract void exit();
 
@@ -71,13 +71,13 @@ public abstract class Display {
     public abstract long createSurface(VkCommon common);
 
     /**
-     * Called when {@link Rosella} has finished initializing so the display can do what it needs to do
+     * Called when {@link LegacyRosella} has finished initializing so the display can do what it needs to do
      */
     public void onReady() {
     }
 
     /**
-     * When swapchain recreation happens, the size may be 0, 0. we need to wait for the display's size to not be 0, 0. Not doing so may crash {@link Rosella}
+     * When swapchain recreation happens, the size may be 0, 0. we need to wait for the display's size to not be 0, 0. Not doing so may crash {@link LegacyRosella}
      */
     public abstract void waitForNonZeroSize();
 }

@@ -10,15 +10,15 @@ public abstract class ResourceDependency {
     public final GraphNode node;
 
     public final ResourceAccess accessType;
-    public final int stageMask;
-    public final int accessMask;
 
-    protected ResourceDependency(GraphNode node, ResourceAccess accessType, int stageMask, int accessMask) {
+    protected ResourceDependency(GraphNode node, ResourceAccess accessType) {
         this.node = node;
         this.accessType = accessType;
-        this.stageMask = stageMask;
-        this.accessMask = accessMask;
     }
+
+    public abstract void reset();
+
+    public abstract Resource getDependency();
 
     /**
      * @return True if this dependency is satisfied.

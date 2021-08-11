@@ -1,5 +1,6 @@
 package me.hydos.rosella.vkobjects;
 
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.LegacyVulkanDevice;
 import me.hydos.rosella.device.VulkanQueues;
 import me.hydos.rosella.display.Display;
@@ -7,7 +8,7 @@ import me.hydos.rosella.memory.Memory;
 import me.hydos.rosella.util.SemaphorePool;
 
 /**
- * Common fields shared within the {@link me.hydos.rosella.Rosella} instance. sharing this info with other instances of the engine is extremely unsafe.
+ * Common fields shared within the {@link LegacyRosella} instance. sharing this info with other instances of the engine is extremely unsafe.
  */
 public class VkCommon {
 

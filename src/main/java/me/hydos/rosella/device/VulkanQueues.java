@@ -1,15 +1,9 @@
 package me.hydos.rosella.device;
 
-import me.hydos.rosella.vkobjects.VkCommon;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.vulkan.VkQueue;
-
-import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
-import static org.lwjgl.vulkan.VK10.vkGetDeviceQueue;
+import me.hydos.rosella.LegacyRosella;
 
 /**
- * The presentation and graphics queue used in {@link me.hydos.rosella.Rosella}
+ * The presentation and graphics queue used in {@link LegacyRosella}
  */
 public class VulkanQueues {
 

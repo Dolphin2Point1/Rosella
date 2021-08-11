@@ -1,6 +1,6 @@
 package me.hydos.rosella.init;
 
-import me.hydos.rosella.Rosella;
+import me.hydos.rosella.LegacyRosella;
 import me.hydos.rosella.device.VulkanDevice;
 import me.hydos.rosella.device.VulkanQueue;
 import me.hydos.rosella.init.features.ApplicationFeature;
@@ -146,7 +146,7 @@ public class DeviceBuilder {
                         this.unsatisfiedRequirements.remove(feature.getFeatureName());
                     }
                 } catch (Exception ex) {
-                    Rosella.LOGGER.warn("Exception during support test for feature \"" + feature.getFeatureName() + "\"", ex);
+                    LegacyRosella.LOGGER.warn("Exception during support test for feature \"" + feature.getFeatureName() + "\"", ex);
                 }
             }
         }
@@ -191,7 +191,7 @@ public class DeviceBuilder {
                         enabledFeatures.put(feature.getFeatureName(), metadata);
                     }
                 } catch (Exception ex) {
-                    Rosella.LOGGER.warn("Exception while enabling feature \"" + feature.getFeatureName() + "\"", ex);
+                    LegacyRosella.LOGGER.warn("Exception while enabling feature \"" + feature.getFeatureName() + "\"", ex);
                 }
             }
 

@@ -1,6 +1,6 @@
 package me.hydos.rosella.render.shader
 
-import me.hydos.rosella.Rosella
+import me.hydos.rosella.LegacyRosella
 import me.hydos.rosella.device.LegacyVulkanDevice
 import me.hydos.rosella.render.util.compileShaderFile
 import me.hydos.rosella.util.VkUtils.ok
@@ -10,7 +10,7 @@ import org.lwjgl.vulkan.VK10
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo
 import java.nio.ByteBuffer
 
-class ShaderProgram(val raw: RawShaderProgram, val rosella: Rosella, maxObjects: Int) {
+class ShaderProgram(val raw: RawShaderProgram, val rosella: LegacyRosella, maxObjects: Int) {
 
     private val fragmentShader by lazy {
         compileShaderFile(raw.fragmentShader!!, ShaderType.FRAGMENT_SHADER).also {

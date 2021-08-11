@@ -19,10 +19,9 @@ public class ImageResource extends Resource {
     /**
      * Adds a dependency to the list of dependant operations.
      *
-     * Dependencies are managed by the {@link DependantResource} class and all
-     * operations changing dependencies must be initiated by calling a ResourceDependency function. As such this
-     * function must only be called inside the ResourceDependency class. Failure to comply might result in invalid
-     * graph state.
+     * Dependencies are managed by the dependant resource and all operations changing dependencies must be initiated
+     * by the dependant resource. As such this function must only be called by other resources. Failure to comply
+     * might result in invalid graph state.
      *
      * This function is fully thread safe.
      *
@@ -37,10 +36,9 @@ public class ImageResource extends Resource {
     /**
      * Removes a dependency from the list of dependant operations.
      *
-     * Dependencies are managed by the {@link DependantResource} class and all
-     * operations changing dependencies must be initiated by calling a ResourceDependency function. As such this
-     * function must only be called inside the ResourceDependency class. Failure to comply might result in invalid
-     * graph state.
+     * Dependencies are managed by the dependant resource and all operations changing dependencies must be initiated
+     * by the dependant resource. As such this function must only be called by other resources. Failure to comply
+     * might result in invalid graph state.
      *
      * This function is fully thread safe.
      *
@@ -52,7 +50,7 @@ public class ImageResource extends Resource {
         }
     }
 
-    public Set<DependantImageResource> getDerivations() {
+    public Set<DependantImageResource> getDependencies() {
         return this.dependants;
     }
 }

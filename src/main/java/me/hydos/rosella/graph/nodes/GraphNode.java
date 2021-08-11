@@ -2,7 +2,7 @@ package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.resources.Resource;
-import me.hydos.rosella.graph.resources.ResourceDependency;
+import me.hydos.rosella.graph.resources.DependantResource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -81,7 +81,7 @@ public abstract class GraphNode {
         return List.of();
     }
 
-    public List<ResourceDependency> getAllDependencies() {
+    public List<DependantResource> getAllDependencies() {
         return List.of();
     }
 

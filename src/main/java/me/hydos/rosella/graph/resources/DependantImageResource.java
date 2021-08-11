@@ -3,11 +3,11 @@ package me.hydos.rosella.graph.resources;
 import me.hydos.rosella.graph.IllegalGraphStateException;
 import me.hydos.rosella.graph.nodes.GraphNode;
 
-public class FramebufferResourceDependency extends FramebufferResource implements DependantResource {
+public class DependantImageResource extends ImageResource implements DependantResource {
 
-    private FramebufferResource source;
+    private ImageResource source;
 
-    public FramebufferResourceDependency(GraphNode graphNode, ResourceAccess accessType) {
+    public DependantImageResource(GraphNode graphNode, ResourceAccess accessType) {
         super(graphNode);
     }
 
@@ -19,7 +19,7 @@ public class FramebufferResourceDependency extends FramebufferResource implement
      *
      * @param newSource The new source
      */
-    public void setSource(FramebufferResource newSource) {
+    protected void setDependency(ImageResource newSource) {
         if(newSource != null && !isInSameGraph(newSource)) {
             throw new IllegalGraphStateException("Tried to depend on a resource in a different graph");
         }
@@ -40,7 +40,7 @@ public class FramebufferResourceDependency extends FramebufferResource implement
     @Override
     public void clearSource() {
         synchronized (this) {
-            if (source != null) {
+            if(source != null) {
                 source.removeDependency(this);
                 source = null;
             }

@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
 import me.hydos.rosella.Rosella;
 import me.hydos.rosella.graph.nodes.GraphNode;
-import me.hydos.rosella.graph.resources.ResourceDependency;
+import me.hydos.rosella.graph.resources.DependantResource;
 
 import org.apache.logging.log4j.Logger;
 
@@ -152,21 +152,21 @@ public class GraphEngine {
             }
 
             meta = new NodeMeta(current, parent, parent.iterationID);
-            for(ResourceDependency dependency : current.getAllDependencies()) {
+            for(DependantResource dependency : current.getAllDependencies()) {
                 if(!dependency.isSatisfied()) {
                     throw new IllegalGraphStateException("Unsatisfied dependency in non dead graph node");
                 }
 
-                initializeFromAnchor(dependency.node, meta);
+                initializeFromAnchor(dependency.getNode(), meta);
             }
         }
 
         private void eliminateDeadNode(GraphNode node) {
             // Only need to remove links to non dead nodes, and there cannot be any downwards non dead node since then this node wouldn't be dead
-            for(ResourceDependency dependency : node.getAllDependencies()) {
+            for(DependantResource dependency : node.getAllDependencies()) {
                 if(dependency.isSatisfied()) {
-                    if(dependency.getDependency().sourceNode.meta != null) {
-                        dependency.reset();
+                    if(dependency.getSource().getNode().meta != null) {
+                        dependency.clearSource();
                     }
                 }
             }

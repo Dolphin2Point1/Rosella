@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.resources;
 
 import me.hydos.rosella.graph.nodes.GraphNode;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents data passed between nodes in a graph.
@@ -15,29 +16,32 @@ public abstract class Resource {
     public Object compileMeta = null;
 
     /**
-     * The node that provides this resource
+     * The node that provides this resource.
      */
-    public final GraphNode sourceNode;
+    public final GraphNode node;
 
     /**
-     * @param node The node that provides the resource
+     * @return The node owning this resource.
      */
-    protected Resource(GraphNode node) {
-        this.sourceNode = node;
+    public GraphNode getNode() {
+        return this.node;
     }
 
     /**
-     * Returns true if this resources is the result of some operation on a different resource.
-     *
-     * @return True if this resource is derived.
+     * @param node The node that provides the resource.
      */
-    public abstract boolean isDerived();
+    protected Resource(GraphNode node) {
+        this.node = node;
+    }
+
 
     /**
-     * If this resource is derived returns the dependency that defines the source resource.
-     * If this resource is not derived this function will return null.
+     * Tests if both resources are part of the same render graph.
      *
-     * @return The source resource dependency or null if the resource is not derived.
+     * @param other The resource to compare to.
+     * @return True if both resources are part of the same render graph.
      */
-    public abstract ResourceDependency getSource();
+    public boolean isInSameGraph(@NotNull Resource other) {
+        return this.node.graph == other.node.graph;
+    }
 }

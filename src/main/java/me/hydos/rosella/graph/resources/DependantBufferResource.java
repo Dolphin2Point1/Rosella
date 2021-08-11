@@ -3,11 +3,11 @@ package me.hydos.rosella.graph.resources;
 import me.hydos.rosella.graph.IllegalGraphStateException;
 import me.hydos.rosella.graph.nodes.GraphNode;
 
-public class FramebufferResourceDependency extends FramebufferResource implements DependantResource {
+public class DependantBufferResource extends BufferResource implements DependantResource {
 
-    private FramebufferResource source;
+    private BufferResource source = null;
 
-    public FramebufferResourceDependency(GraphNode graphNode, ResourceAccess accessType) {
+    public DependantBufferResource(GraphNode graphNode, ResourceAccess accessType) {
         super(graphNode);
     }
 
@@ -19,9 +19,9 @@ public class FramebufferResourceDependency extends FramebufferResource implement
      *
      * @param newSource The new source
      */
-    public void setSource(FramebufferResource newSource) {
+    public void setSource(BufferResource newSource) {
         if(newSource != null && !isInSameGraph(newSource)) {
-            throw new IllegalGraphStateException("Tried to depend on a resource in a different graph");
+            throw new IllegalGraphStateException("Tried to derive resource in a different graph");
         }
 
         synchronized (this) {
@@ -40,22 +40,22 @@ public class FramebufferResourceDependency extends FramebufferResource implement
     @Override
     public void clearSource() {
         synchronized (this) {
-            if (source != null) {
-                source.removeDependency(this);
-                source = null;
+            if(this.source != null) {
+                this.source.removeDependency(this);
+                this.source = null;
             }
         }
     }
 
     @Override
-    public Resource getSource() {
-        return source;
+    public BufferResource getSource() {
+        return this.source;
     }
 
     @Override
     public boolean isSatisfied() {
         synchronized (this) {
-            return this.source != null;
+            return source != null;
         }
     }
 }

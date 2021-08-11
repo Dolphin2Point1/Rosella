@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.resources.BufferCopyRegion;
 import me.hydos.rosella.graph.resources.BufferResource;
-import me.hydos.rosella.graph.resources.BufferResourceDependency;
+import me.hydos.rosella.graph.resources.DependantBufferResource;
 import me.hydos.rosella.graph.resources.ResourceAccess;
 
 import java.nio.ByteBuffer;
@@ -12,19 +12,17 @@ import java.util.List;
 
 public class UploadBufferNode extends GraphNode {
 
-    protected final BufferResourceDependency dstBuffer;
-    protected final BufferResource result;
+    protected final DependantBufferResource dstBuffer;
     protected final List<BufferCopyRegion> copyRegions = new ObjectArrayList<>();
 
     public UploadBufferNode(RenderGraph graph) {
         super(graph);
-        this.dstBuffer = new BufferResourceDependency(this, ResourceAccess.WRITE_ONLY);
-        this.result = new BufferResource(this, this.dstBuffer);
+        this.dstBuffer = new DependantBufferResource(this, ResourceAccess.WRITE_ONLY);
         graph.addNode(this);
     }
 
     public void setDstBuffer(BufferResource dstBuffer) {
-        this.dstBuffer.setDependency(dstBuffer);
+        this.dstBuffer.setSource(dstBuffer);
     }
 
     /**
@@ -37,7 +35,7 @@ public class UploadBufferNode extends GraphNode {
     }
 
     public BufferResource getResult() {
-        return this.result;
+        return this.dstBuffer;
     }
 
     public void addCopyRegion(BufferCopyRegion region) {

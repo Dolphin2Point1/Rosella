@@ -2,7 +2,7 @@ package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.resources.BufferResource;
-import me.hydos.rosella.graph.resources.BufferResourceDependency;
+import me.hydos.rosella.graph.resources.DependantBufferResource;
 import me.hydos.rosella.graph.resources.ResourceAccess;
 
 import java.nio.ByteBuffer;
@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 public class DownloadBufferNode extends GraphNode {
 
-    protected final BufferResourceDependency source;
+    protected final DependantBufferResource source;
     protected final CompletableFuture<ByteBuffer> result;
 
     protected ByteBuffer dst;
@@ -19,14 +19,14 @@ public class DownloadBufferNode extends GraphNode {
 
     public DownloadBufferNode(RenderGraph graph) {
         super(graph);
-        this.source = new BufferResourceDependency(this, ResourceAccess.READ_ONLY);
+        this.source = new DependantBufferResource(this, ResourceAccess.READ_ONLY);
         this.result = new CompletableFuture<>();
         graph.addNode(this);
     }
 
     public void setSource(BufferResource source) {
         synchronized(this) {
-            this.source.setDependency(source);
+            this.source.setSource(source);
         }
     }
 

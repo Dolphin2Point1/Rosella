@@ -1,11 +1,10 @@
 package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
-import me.hydos.rosella.graph.resources.BufferResource;
-import me.hydos.rosella.graph.resources.DependantBufferResource;
-import me.hydos.rosella.graph.resources.ResourceAccess;
+import me.hydos.rosella.graph.resources.*;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -75,5 +74,10 @@ public class DownloadBufferNode extends GraphNode {
     @Override
     public void destroy() {
         this.result.cancel(true);
+    }
+
+    @Override
+    public List<DependantResource> getAllDependencies() {
+        return List.of(source);
     }
 }

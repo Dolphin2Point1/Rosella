@@ -2,10 +2,7 @@ package me.hydos.rosella.graph.nodes;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.hydos.rosella.graph.RenderGraph;
-import me.hydos.rosella.graph.resources.BufferCopyRegion;
-import me.hydos.rosella.graph.resources.BufferResource;
-import me.hydos.rosella.graph.resources.DependantBufferResource;
-import me.hydos.rosella.graph.resources.ResourceAccess;
+import me.hydos.rosella.graph.resources.*;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -19,6 +16,11 @@ public class UploadBufferNode extends GraphNode {
         super(graph);
         this.dstBuffer = new DependantBufferResource(this, ResourceAccess.WRITE_ONLY);
         graph.addNode(this);
+    }
+
+    @Override
+    public List<DependantResource> getAllDependencies() {
+        return List.of(dstBuffer);
     }
 
     public void setDstBuffer(BufferResource dstBuffer) {

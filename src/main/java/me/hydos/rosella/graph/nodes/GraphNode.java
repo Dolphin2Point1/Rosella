@@ -2,10 +2,12 @@ package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitNode;
+import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitProcess;
 import me.hydos.rosella.graph.resources.Resource;
 import me.hydos.rosella.graph.resources.DependantResource;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,6 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class GraphNode implements OneTimeSubmitNode {
 
     private static final AtomicLong nextID = new AtomicLong(1);
+
+    protected static List<Resource> EMPTY_RESOURCE_LIST = Collections.emptyList();
+    protected static List<DependantResource> EMPTY_DEPENDANT_RESOURCE_LIST = Collections.emptyList();
 
     /**
      * Value used to uniquely identify and compare nodes for datastructures.
@@ -78,8 +83,6 @@ public abstract class GraphNode implements OneTimeSubmitNode {
     public void destroy() {
     }
 
-    public abstract List<Resource> getAllResources();
-
     public abstract List<DependantResource> getAllDependencies();
 
     @Override
@@ -87,7 +90,8 @@ public abstract class GraphNode implements OneTimeSubmitNode {
         return Objects.hash(this.id); // TODO faster?
     }
 
-    public void otsInit() {
+    @Override
+    public void otsInit(OneTimeSubmitProcess process) {
         throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
     }
 }

@@ -1,7 +1,7 @@
 package me.hydos.rosella.example;
 
-import me.hydos.rosella.Rosella;
-import me.hydos.rosella.display.GlfwWindow;
+import me.hydos.rosella.LegacyRosella;
+import me.hydos.rosella.display.LegacyGlfwWindow;
 import me.hydos.rosella.init.InitializationRegistry;
 import me.hydos.rosella.file.model.GlbModelLoader;
 import me.hydos.rosella.file.model.GlbRenderObject;
@@ -24,8 +24,8 @@ import org.lwjgl.system.Configuration;
 import org.lwjgl.vulkan.VK10;
 
 public class PortalJava {
-    public static final GlfwWindow window;
-    public static final Rosella rosella;
+    public static final LegacyGlfwWindow window;
+    public static final LegacyRosella rosella;
 
     public static final int WIDTH = 1280;
 
@@ -33,8 +33,8 @@ public class PortalJava {
 
     static {
 //        System.loadLibrary("renderdoc");
-        window = new GlfwWindow(WIDTH, TOP, "Portal 3: Java Edition", true);
-        rosella = new Rosella(new InitializationRegistry(), window, "Portal 3", VK10.VK_MAKE_VERSION(1, 0, 0));
+        window = new LegacyGlfwWindow(WIDTH, TOP, "Portal 3: Java Edition", true);
+        rosella = new LegacyRosella(new InitializationRegistry(), window, "Portal 3", VK10.VK_MAKE_VERSION(1, 0, 0));
     }
 
     public static final Matrix4f viewMatrix = new Matrix4f();
@@ -47,7 +47,7 @@ public class PortalJava {
     public static ShaderProgram guiShader;
 
     public static void main(String[] args) {
-        Configuration.ASSIMP_LIBRARY_NAME.set("/home/haydenv/IdeaProjects/hYdos/rosella/libassimp.so"); //FIXME: LWJGL bad. LWJGL 4 when https://github.com/LWJGL/lwjgl3/issues/642
+        Configuration.ASSIMP_LIBRARY_NAME.set("/home/lorenzorai/Documents/Dev/Rosella/libassimp.so"); //FIXME: LWJGL bad. LWJGL 4 when https://github.com/LWJGL/lwjgl3/issues/642
         loadShaders();
         loadMaterials();
         setupMainMenuScene();

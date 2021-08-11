@@ -58,7 +58,7 @@ public class OneTimeSubmitProcess implements Runnable {
     private void preprocessGraph() {
         int iterationID = 0;
         for (GraphNode anchor : this.graph.getAnchors()) {
-            anchor.otsInit();
+            anchor.otsInit(this);
             NodeMeta meta = new NodeMeta(anchor, iterationID++);
 
             initializeFromAnchor(anchor, meta);
@@ -86,7 +86,7 @@ public class OneTimeSubmitProcess implements Runnable {
             meta.unionMerge(parent);
 
         } else {
-            current.otsInit();
+            current.otsInit(this);
             meta = new NodeMeta(current, parent, parent.iterationID);
             for (DependantResource dependency : current.getAllDependencies()) {
                 if (!dependency.isSatisfied()) {

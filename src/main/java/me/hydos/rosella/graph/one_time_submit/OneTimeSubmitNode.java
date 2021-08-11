@@ -16,7 +16,11 @@ public interface OneTimeSubmitNode {
     /**
      * Called during the scan phase of a one time submit process.
      *
+     * A node must resolve all of its resources using the provided info. Not resolving any resource will cause
+     * compilation to fail.
+     *
      * @param info
+     * @return The execution requirements of the node.
      */
-    void otsScan(OTSScanInfo info);
+    OTSNodeExecutionRequirements otsScan(OTSScanInfo info);
 }

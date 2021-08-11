@@ -12,4 +12,11 @@ public interface OneTimeSubmitNode {
      * having this function called on them and this function may be called concurrently for different nodes.
      */
     void otsInit(OneTimeSubmitProcess process);
+
+    /**
+     * Called during the scan phase of a one time submit process.
+     *
+     * @param info
+     */
+    void otsScan(OTSScanInfo info);
 }

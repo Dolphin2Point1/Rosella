@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
+import me.hydos.rosella.graph.one_time_submit.OTSScanInfo;
 import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitNode;
 import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitProcess;
 import me.hydos.rosella.graph.resources.Resource;
@@ -92,6 +93,11 @@ public abstract class GraphNode implements OneTimeSubmitNode {
 
     @Override
     public void otsInit(OneTimeSubmitProcess process) {
+        throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
+    }
+
+    @Override
+    public void otsScan(OTSScanInfo info) {
         throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
     }
 }

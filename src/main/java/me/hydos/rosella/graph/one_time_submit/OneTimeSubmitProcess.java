@@ -126,9 +126,13 @@ public class OneTimeSubmitProcess implements Runnable {
 
         private Set<GraphNode> heads = null;
 
+        private int unsatisfiedDependencies;
+
         public NodeMeta(GraphNode node, int iterationID) {
             this.node = node;
             node.meta = this;
+
+            this.unsatisfiedDependencies = node.getAllDependencies().size();
 
             this.iterationID = iterationID;
         }
@@ -138,6 +142,8 @@ public class OneTimeSubmitProcess implements Runnable {
             node.meta = this;
 
             this.iterationID = iterationID;
+
+            this.unsatisfiedDependencies = node.getAllDependencies().size();
 
             this.unionParent = mergeWith.findRoot();
         }
@@ -181,6 +187,20 @@ public class OneTimeSubmitProcess implements Runnable {
             }
 
             return root.heads;
+        }
+
+        /**
+         * Marks one dependency of this resource as resolved.
+         *
+         * @return True if all dependencies of this resource are resolved.
+         */
+        public boolean resolveDependency() {
+            this.unsatisfiedDependencies--;
+            if(this.unsatisfiedDependencies < 0) {
+                throw new IllegalGraphStateException("Negative unsatisfied dependency count. How is this even possible?");
+            }
+
+            return this.unsatisfiedDependencies == 0;
         }
     }
 }

@@ -1,59 +1,14 @@
 package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
-import me.hydos.rosella.graph.one_time_submit.OTSNodeExecutionRequirements;
-import me.hydos.rosella.graph.one_time_submit.OTSScanPhase;
-import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitNode;
-import me.hydos.rosella.graph.one_time_submit.OneTimeSubmitProcess;
-import me.hydos.rosella.graph.resources.Resource;
-import me.hydos.rosella.graph.resources.DependantResource;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A node is the basic building block of render graphs.
  * They represent operations that should be performed on resources.
  */
-public abstract class GraphNode implements OneTimeSubmitNode {
+public interface GraphNode {
 
-    private static final AtomicLong nextID = new AtomicLong(1);
-
-    protected static List<Resource> EMPTY_RESOURCE_LIST = Collections.emptyList();
-    protected static List<DependantResource> EMPTY_DEPENDANT_RESOURCE_LIST = Collections.emptyList();
-
-    /**
-     * Value used to uniquely identify and compare nodes for datastructures.
-     */
-    public final long id = nextID.getAndIncrement();
-
-    /**
-     * The graph that this node is attached to.
-     */
-    public final RenderGraph graph;
-
-    /**
-     * Used to store metadata for the graph compile process. Provided here to avoid unnecessary lookup in a table.
-     * This is for the graph compile process and must not be touched by the application. It is expected that all
-     * nodes submitted to a compile process have this value set to null.
-     */
-    public Object meta = null;
-
-    /**
-     * This constructor will not call {@link me.hydos.rosella.graph.RenderGraph#addNode(GraphNode)}.
-     * The subclass must make sure to call {@link me.hydos.rosella.graph.RenderGraph#addNode(GraphNode)} unless it throws an
-     * exception. Not failing with an exception and not attaching to the graph is considered invalid state.
-     *
-     * @see me.hydos.rosella.graph.RenderGraph#addNode(GraphNode)
-     *
-     * @param graph The graph that this node should attach to.
-     */
-    protected GraphNode(@NotNull RenderGraph graph) {
-        this.graph = graph;
-    }
+    RenderGraph getGraph();
 
     /**
      * Returns true if this node is a anchor node.
@@ -65,14 +20,9 @@ public abstract class GraphNode implements OneTimeSubmitNode {
      * In general this means anchor nodes are nodes whose operations have effects outside of the graph. For example
      * global resource writes, resource downloads or presentation.
      *
-     * This function must always return the same value and must be ready to call when {@link me.hydos.rosella.graph.RenderGraph#addNode(GraphNode)}
-     * is called.
-     *
      * @return True if this node is a anchor
      */
-    public boolean isAnchor() {
-        return false;
-    }
+    boolean isAnchor();
 
     /**
      * Frees any resources still owned by the node.
@@ -82,28 +32,13 @@ public abstract class GraphNode implements OneTimeSubmitNode {
      *
      * Nodes must not raise errors if this function is called multiple times.
      */
-    public void destroy() {
-    }
+    void destroy();
 
-    public abstract List<DependantResource> getAllDependencies();
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id); // TODO faster?
-    }
-
-    @Override
-    public void otsInit(OneTimeSubmitProcess process) {
-        throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
-    }
-
-    @Override
-    public OTSNodeExecutionRequirements otsScan(OTSScanPhase phase) {
-        throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
-    }
-
-    @Override
-    public void otsRecord() {
-        throw new RuntimeException(this.getClass().getSimpleName() + " does not support the one time submit process");
-    }
+    /**
+     * A globally unique id to identify this node. The id should be acquired using the id generator of the
+     * {@link me.hydos.rosella.graph.nodes.AbstractGraphNode} class or must otherwise ensure global uniqueness.
+     *
+     * @return A globally unique id for this node.
+     */
+    long getID();
 }

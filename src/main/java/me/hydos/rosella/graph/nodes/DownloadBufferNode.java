@@ -1,83 +1,62 @@
 package me.hydos.rosella.graph.nodes;
 
-import me.hydos.rosella.graph.RenderGraph;
-import me.hydos.rosella.graph.resources.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import me.hydos.rosella.graph.one_time_submit.OTSNode;
+import me.hydos.rosella.graph.one_time_submit.OTSNodeMetadata;
+import me.hydos.rosella.graph.one_time_submit.OTSRenderGraph;
+import me.hydos.rosella.graph.resources.BufferCopyRegion;
+import me.hydos.rosella.graph.resources.BufferResource;
+import me.hydos.rosella.graph.resources.ResourceAccess;
+import org.lwjgl.vulkan.VK10;
 
-import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
-public class DownloadBufferNode extends GraphNode {
+public class DownloadBufferNode extends AbstractGraphNode implements OTSNode {
 
-    protected final DependantBufferResource source;
-    protected final CompletableFuture<ByteBuffer> result;
+    private OTSNodeMetadata otsMetadata = null;
 
-    protected ByteBuffer dst;
-    protected long sourceOffset;
+    private final List<BufferCopyRegion> copyRegions;
 
-    public DownloadBufferNode(RenderGraph graph) {
+    public final BufferResource result;
+
+    public DownloadBufferNode(OTSRenderGraph graph, BufferResource srcBuffer, BufferCopyRegion copyRegion) {
         super(graph);
-        this.source = new DependantBufferResource(this, ResourceAccess.READ_ONLY);
-        this.result = new CompletableFuture<>();
-        graph.addNode(this);
+
+        this.copyRegions = List.of(copyRegion);
+
+        NodeConfigurator config = graph.addNode(this);
+        this.result = config.createBufferResource(srcBuffer,
+                ResourceAccess.READ_ONLY,
+                VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                VK10.VK_ACCESS_TRANSFER_READ_BIT,
+                VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
+        config.complete(0); // TODO select queues
     }
 
-    public void setSource(BufferResource source) {
-        synchronized(this) {
-            this.source.setSource(source);
+    public DownloadBufferNode(OTSRenderGraph graph, BufferResource srcBuffer, List<BufferCopyRegion> copyRegions) {
+        super(graph);
+
+        if(copyRegions.isEmpty()) {
+            throw new IllegalArgumentException("Copy regions list is empty");
         }
-    }
+        this.copyRegions = new ObjectArrayList<>(copyRegions);
 
-    /**
-     * Defines the buffer where the downloaded data will be stored.
-     * The amount of data copied will be <code>min(sourceSize - offset, dstRemaining)</code>
-     *
-     * The dst buffer must not be modified until either a different buffer is provided to this function
-     * or the result future is completed.
-     *
-     * @param dst The destination buffer
-     */
-    public void setDstBuffer(ByteBuffer dst) {
-        synchronized(this) {
-            this.dst = dst;
-        }
-    }
-
-    /**
-     * Defines the offset into the source buffer from where to start the download range.
-     *
-     * @param offset The offset into the source buffer
-     */
-    public void setSourceOffset(long offset) {
-        synchronized (this) {
-            this.sourceOffset = offset;
-        }
-    }
-
-    /**
-     * Returns a future that can be used to get the result of the download operation.
-     *
-     * If the download operation is aborted (for example if the graph gets aborted) the future will be canceled.
-     *
-     * @return Future providing the result of the download operation
-     */
-    public Future<ByteBuffer> getResult() {
-        return this.result;
+        NodeConfigurator config = graph.addNode(this);
+        this.result = config.createBufferResource(srcBuffer,
+                ResourceAccess.READ_ONLY,
+                VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                VK10.VK_ACCESS_TRANSFER_READ_BIT,
+                VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
+        config.complete(0); // TODO select queues
     }
 
     @Override
-    public boolean isAnchor() {
-        return true;
+    public void setOTSMetadata(OTSNodeMetadata metadata) {
+        this.otsMetadata = metadata;
     }
 
     @Override
-    public void destroy() {
-        this.result.cancel(true);
-    }
-
-    @Override
-    public List<DependantResource> getAllDependencies() {
-        return List.of(source);
+    public OTSNodeMetadata getOTSMetadata() {
+        return this.otsMetadata;
     }
 }

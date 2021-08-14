@@ -1,47 +1,20 @@
 package me.hydos.rosella.graph.resources;
 
-import me.hydos.rosella.graph.nodes.GraphNode;
-import org.jetbrains.annotations.NotNull;
+import me.hydos.rosella.graph.RenderGraph;
 
 /**
  * Represents data passed between nodes in a graph.
  */
-public abstract class Resource {
+public interface Resource {
 
     /**
-     * Used to store metadata for the graph compile process. Provided here to avoid unnecessary lookup in a table.
-     * This is for the graph compile process and must not be touched by the application. It is expected that all
-     * resources submitted to a compile process have this value set to null.
+     * @return The graph that this resource is a part of
      */
-    public Object compileMeta = null;
+    RenderGraph getGraph();
 
     /**
-     * The node that provides this resource.
+     * @param other Another resource
+     * @return True if the other resource is part of the same graph as this resource
      */
-    public final GraphNode node;
-
-    /**
-     * @return The node owning this resource.
-     */
-    public GraphNode getNode() {
-        return this.node;
-    }
-
-    /**
-     * @param node The node that provides the resource.
-     */
-    protected Resource(GraphNode node) {
-        this.node = node;
-    }
-
-
-    /**
-     * Tests if both resources are part of the same render graph.
-     *
-     * @param other The resource to compare to.
-     * @return True if both resources are part of the same render graph.
-     */
-    public boolean isInSameGraph(@NotNull Resource other) {
-        return this.node.graph == other.node.graph;
-    }
+    boolean isInSameGraph(Resource other);
 }

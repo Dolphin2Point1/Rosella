@@ -1,13 +1,12 @@
 package me.hydos.rosella.graph.present;
 
 import me.hydos.rosella.graph.RenderGraph;
-import me.hydos.rosella.graph.nodes.GraphNode;
+import me.hydos.rosella.graph.nodes.AbstractGraphNode;
 import me.hydos.rosella.graph.resources.DependantResource;
-import me.hydos.rosella.graph.resources.Resource;
 
 import java.util.List;
 
-public class PresentNode extends GraphNode {
+public class PresentNode extends AbstractGraphNode {
 
     private final BasicDisplaySurface surface;
 
@@ -23,6 +22,6 @@ public class PresentNode extends GraphNode {
 
     @Override
     public List<DependantResource> getAllDependencies() {
-        return GraphNode.EMPTY_DEPENDANT_RESOURCE_LIST;
+        return AbstractGraphNode.EMPTY_DEPENDANT_RESOURCE_LIST;
     }
 }

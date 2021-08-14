@@ -1,35 +1,37 @@
 package me.hydos.rosella.graph.nodes;
 
 import me.hydos.rosella.graph.RenderGraph;
+import me.hydos.rosella.graph.one_time_submit.OTSNode;
+import me.hydos.rosella.graph.one_time_submit.OTSNodeMetadata;
+import me.hydos.rosella.graph.one_time_submit.OTSRenderGraph;
 import me.hydos.rosella.graph.resources.BufferResource;
-import me.hydos.rosella.graph.resources.DependantResource;
-import me.hydos.rosella.graph.resources.Resource;
+import me.hydos.rosella.graph.resources.ResourceAccess;
 
-import java.util.List;
+public class CreateBufferNode extends AbstractGraphNode implements OTSNode {
 
-public class CreateBufferNode extends GraphNode {
+    private OTSNodeMetadata otsMetadata = null;
 
-    protected final BufferResource buffer;
-    protected long size;
+    public final BufferResource buffer;
 
-    public CreateBufferNode(RenderGraph graph) {
+    public CreateBufferNode(OTSRenderGraph graph, long bufferSize) {
         super(graph);
-        this.buffer = new BufferResource(this);
-        graph.addNode(this);
-    }
 
-    @Override
-    public List<DependantResource> getAllDependencies() {
-        return GraphNode.EMPTY_DEPENDANT_RESOURCE_LIST;
-    }
-
-    public void setSize(long size) {
-        synchronized (this) {
-            this.size = size;
-        }
+        OTSNode.NodeConfigurator config = graph.addNode(this);
+        this.buffer = config.createBufferResource(bufferSize, ResourceAccess.NONE, 0, 0, 0);
+        config.complete(0);
     }
 
     public BufferResource getBuffer() {
         return this.buffer;
+    }
+
+    @Override
+    public void setOTSMetadata(OTSNodeMetadata metadata) {
+        this.otsMetadata = metadata;
+    }
+
+    @Override
+    public OTSNodeMetadata getOTSMetadata() {
+        return this.otsMetadata;
     }
 }

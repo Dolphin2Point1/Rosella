@@ -186,10 +186,12 @@ public class OTSRenderGraph implements RenderGraph {
                 this.parents = new ObjectArraySet<>();
             }
 
+            OTSNodeMetadata parent = ((OTSFramebufferMeta) sSource.data).node;
+            this.parents.add(parent);
+
             this.inRenderPass = inRenderPass;
             if(inRenderPass) {
-                this.renderPassParent = ((OTSFramebufferMeta) sSource.data).node.getOTSMetadata();
-                this.parents.add(this.renderPassParent);
+                this.renderPassParent = parent;
             }
 
             this.framebufferResource = new StaticFramebufferResource(OTSRenderGraph.this, sSource);
@@ -263,7 +265,7 @@ public class OTSRenderGraph implements RenderGraph {
                 }
                 if(this.framebufferResource != null) {
                     this.framebufferResource.inject();
-                    // TODO
+                    this.framebufferResource.data = new OTSFramebufferMeta(metadata);
                 }
 
                 if(anchor) {

@@ -2,11 +2,9 @@ package me.hydos.rosella.graph.one_time_submit;
 
 public class OTSFramebufferMeta {
 
-    public final OTSNode node;
-    public final int renderPassID;
+    public final OTSNodeMetadata node;
 
-    public OTSFramebufferMeta(OTSNode node, int renderPassID) {
+    public OTSFramebufferMeta(OTSNodeMetadata node) {
         this.node = node;
-        this.renderPassID = renderPassID;
     }
 }

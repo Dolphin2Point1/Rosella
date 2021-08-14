@@ -209,13 +209,13 @@ public class OTSRenderGraph implements RenderGraph {
                 // Calculate render pass assignments
                 int renderPassID = -1;
                 int renderPassQueueFamilies = supportedQueueFamilies;
-                if(this.renderPassParent == null) {
-                    if(this.inRenderPass) {
+                if(this.inRenderPass) {
+                    if (this.renderPassParent == null) {
                         renderPassID = OTSRenderGraph.this.nextRenderPass();
+                    } else {
+                        renderPassID = this.renderPassParent.renderPassAssignment;
+                        renderPassQueueFamilies &= this.renderPassParent.renderPassQueueFamilies;
                     }
-                } else {
-                    renderPassID = this.renderPassParent.renderPassAssignment;
-                    renderPassQueueFamilies &= this.renderPassParent.renderPassQueueFamilies;
                 }
 
                 long renderPassDependencies = 0;
@@ -223,7 +223,7 @@ public class OTSRenderGraph implements RenderGraph {
                     renderPassDependencies |= other.renderPassDependencies;
                 }
 
-                if(this.renderPassParent != null) {
+                if(this.inRenderPass && this.renderPassParent != null) {
                     if(renderPassQueueFamilies == 0) {
                         // Cannot continue on the same queue family so we need to split
                         renderPassID = OTSRenderGraph.this.nextRenderPass();
@@ -318,7 +318,9 @@ public class OTSRenderGraph implements RenderGraph {
                     if(queueLimits == 0 || cannotMergeWith(parent)) {
                         return 0;
                     }
-                    nodes.add(parent);
+                    if(!nodes.contains(parent)) {
+                        nodes.add(parent); // This is slow...
+                    }
                 }
             }
 
@@ -330,7 +332,9 @@ public class OTSRenderGraph implements RenderGraph {
                         if(queueLimits == 0 || cannotMergeWith(parent)) {
                             return 0;
                         }
-                        nodes.add(parent);
+                        if(!nodes.contains(parent)) {
+                            nodes.add(parent); // This is slow...
+                        }
                     }
                 }
             }

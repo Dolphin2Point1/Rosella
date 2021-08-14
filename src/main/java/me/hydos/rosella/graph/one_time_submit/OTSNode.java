@@ -28,9 +28,9 @@ public interface OTSNode extends GraphNode {
 
         ImageResource createImageResource(ImageResource source, ResourceAccess access, int usageFlags, int accessMask, int stageMask);
 
-        FramebufferResource createFramebufferResource(FramebufferSpec spec);
+        FramebufferResource createFramebufferResource(FramebufferSpec spec, boolean inRenderPass);
 
-        FramebufferResource createFramebufferResource(FramebufferResource source);
+        FramebufferResource createFramebufferResource(FramebufferResource source, boolean inRenderPass);
 
         void complete(boolean anchor, int queueFlags);
 

@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.one_time_submit;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import me.hydos.rosella.graph.GraphEngine;
 import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.resources.*;
@@ -8,17 +9,26 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class OTSRenderGraph implements RenderGraph {
+
+    public final Lock lock = new ReentrantLock();
 
     private State state = State.BUILDING;
 
     private int pendingNodes = 0;
     private final List<OTSNodeMetadata> nodes = new ObjectArrayList<>();
 
-    public final Lock lock = new ReentrantLock();
+    private final AtomicInteger nextRenderpassID = new AtomicInteger(0);
+
+    /**
+     * List for temporary operations to avoid reallocation. Anyone who uses this list must own the graph lock. If the
+     * lock is released the list may be used by others and change content.
+     */
+    private final List<OTSNodeMetadata> tmpList = new ObjectArrayList<>();
 
     public OTSRenderGraph(GraphEngine engine) {
     }
@@ -63,6 +73,10 @@ public class OTSRenderGraph implements RenderGraph {
     public void submit() {
     }
 
+    private int nextRenderPass() {
+        return this.nextRenderpassID.getAndIncrement();
+    }
+
     private enum State {
         BUILDING,
         COMPILING,
@@ -76,8 +90,9 @@ public class OTSRenderGraph implements RenderGraph {
         private List<StaticBufferResource> bufferResources = null;
         private List<StaticImageResource> imageResources = null;
         private StaticFramebufferResource framebufferResource = null;
+        private int renderPassID = -1;
 
-        private Set<OTSNodeMetadata> parents;
+        private Set<OTSNodeMetadata> parents = null;
 
         public NodeConfigurator(OTSNode node) {
             this.node = node;
@@ -103,8 +118,12 @@ public class OTSRenderGraph implements RenderGraph {
             if(this.bufferResources == null) {
                 this.bufferResources = new ObjectArrayList<>();
             }
+            if(this.parents == null) {
+                this.parents = new ObjectArraySet<>();
+            }
 
             StaticBufferResource buffer = new StaticBufferResource(OTSRenderGraph.this, sSource);
+            this.parents.add(((OTSBufferImageMeta) sSource.data).node);
             this.bufferResources.add(buffer);
             return buffer;
         }
@@ -129,16 +148,24 @@ public class OTSRenderGraph implements RenderGraph {
             if(this.imageResources == null) {
                 this.imageResources = new ObjectArrayList<>();
             }
+            if(this.parents == null) {
+                this.parents = new ObjectArraySet<>();
+            }
 
             StaticImageResource image = new StaticImageResource(OTSRenderGraph.this, sSource);
+            this.parents.add(((OTSBufferImageMeta) sSource.data).node);
             this.imageResources.add(image);
             return image;
         }
 
         @Override
-        public FramebufferResource createFramebufferResource(FramebufferSpec spec) {
+        public FramebufferResource createFramebufferResource(FramebufferSpec spec, boolean inRenderPass) {
             if(this.framebufferResource != null) {
                 throw new IllegalStateException("A node cannot own more than 1 framebuffer resource");
+            }
+
+            if(inRenderPass) {
+                this.renderPassID = OTSRenderGraph.this.nextRenderPass();
             }
 
             this.framebufferResource = new StaticFramebufferResource(OTSRenderGraph.this, spec);
@@ -146,7 +173,7 @@ public class OTSRenderGraph implements RenderGraph {
         }
 
         @Override
-        public FramebufferResource createFramebufferResource(FramebufferResource source) {
+        public FramebufferResource createFramebufferResource(FramebufferResource source, boolean inRenderPass) {
             if(!(source instanceof StaticFramebufferResource sSource)) {
                 throw new IllegalArgumentException("Source must've been created from a NodeConfigurator but isn't a StaticFramebufferResource");
             }
@@ -155,35 +182,67 @@ public class OTSRenderGraph implements RenderGraph {
                 throw new IllegalStateException("A node cannot own more than 1 framebuffer resource");
             }
 
+            if(this.parents == null) {
+                this.parents = new ObjectArraySet<>();
+            }
+
+            if(inRenderPass) {
+                this.renderPassID = ((OTSFramebufferMeta) sSource.data).renderPassID;
+                if(this.renderPassID == -1) {
+                    this.renderPassID = OTSRenderGraph.this.nextRenderPass();
+                }
+            }
+
             this.framebufferResource = new StaticFramebufferResource(OTSRenderGraph.this, sSource);
             return this.framebufferResource;
         }
 
         @Override
-        public void complete(boolean anchor, int queueFlags) {
+        public void complete(boolean anchor, int supportedQueueFamilies) {
             try {
                 OTSRenderGraph.this.lock.lock();
                 if(this.node == null) {
                     throw new IllegalStateException("complete or abort has already been called");
                 }
 
-                OTSNodeMetadata metadata = new OTSNodeMetadata(this.node, this.parents);
+                final long rpMask = (1L >> this.renderPassID);
+
+                long renderPassDependencies = 0;
+                for(OTSNodeMetadata other : this.parents) {
+                    renderPassDependencies |= other.renderPassDependencies;
+                }
+                if((rpMask & renderPassDependencies) != 0) {
+                    if(tryMergeRenderPass()) {
+                        renderPassDependencies &= ~rpMask;
+                    } else {
+                        this.renderPassID = OTSRenderGraph.this.nextRenderPass();
+                    }
+                }
+
+                OTSNodeMetadata metadata = new OTSNodeMetadata(OTSRenderGraph.this, this.node, this.parents, supportedQueueFamilies);
+                this.node.setOTSMetadata(metadata);
 
                 if(this.bufferResources != null) {
                     for(StaticBufferResource buffer : this.bufferResources) {
                         buffer.inject();
+                        buffer.data = new OTSBufferImageMeta(metadata);
                     }
                 }
                 if(this.imageResources != null) {
                     for(StaticImageResource image : this.imageResources) {
                         image.inject();
+                        image.data = new OTSBufferImageMeta(metadata);
                     }
                 }
                 if(this.framebufferResource != null) {
                     this.framebufferResource.inject();
+                    // TODO
                 }
 
-                this.node.setOTSMetadata(metadata);
+                if(anchor) {
+                    metadata.setRun();
+                }
+
                 OTSRenderGraph.this.nodes.add(metadata);
 
                 this.notifyGraph();
@@ -206,6 +265,40 @@ public class OTSRenderGraph implements RenderGraph {
             } finally {
                 OTSRenderGraph.this.lock.unlock();
             }
+        }
+
+        private boolean tryMergeRenderPass() {
+            final long rpMask = 1L >> this.renderPassID;
+            List<OTSNodeMetadata> nodes = OTSRenderGraph.this.tmpList;
+            nodes.clear();
+
+            for(OTSNodeMetadata parent : this.parents) {
+                if((parent.renderPassDependencies & rpMask) != 0) {
+                    if(parent.renderPassAssignment != -1 && parent.canRunInsideRenderPass) {
+                        return false;
+                    }
+                    nodes.add(parent);
+                }
+            }
+
+            int current = -1;
+            while(++current != nodes.size()) {
+                for(OTSNodeMetadata parent : nodes.get(current).parents) {
+                    if((parent.renderPassDependencies & rpMask) != 0) {
+                        if(parent.renderPassAssignment != -1 && parent.canRunInsideRenderPass) {
+                            return false;
+                        }
+                        nodes.add(parent);
+                    }
+                }
+            }
+
+            for(OTSNodeMetadata node : nodes) {
+                node.renderPassAssignment = this.renderPassID;
+                node.renderPassDependencies &= ~rpMask;
+            }
+
+            return true;
         }
 
         /**

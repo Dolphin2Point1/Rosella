@@ -1,6 +1,7 @@
 package me.hydos.rosella.graph.resources;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import me.hydos.rosella.graph.IllegalGraphStateException;
 import me.hydos.rosella.graph.RenderGraph;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,7 @@ public class StaticFramebufferResource implements FramebufferResource {
     public final FramebufferSpec framebufferSpec;
 
     private StaticFramebufferResource parent = null;
-    private final List<StaticFramebufferResource> dependants = new ObjectArrayList<>();
+    private StaticFramebufferResource dependant = null;
 
     public StaticFramebufferResource(@NotNull RenderGraph graph, FramebufferSpec spec) {
         this.graph = graph;
@@ -33,7 +34,11 @@ public class StaticFramebufferResource implements FramebufferResource {
      */
     public void inject() {
         if(this.parent != null) {
-            this.parent.dependants.add(this);
+            if(this.parent.dependant != null) {
+                throw new IllegalGraphStateException("Tried to add multiple framebuffer dependencies");
+            }
+
+            this.parent.dependant = this;
         }
     }
 
@@ -41,8 +46,8 @@ public class StaticFramebufferResource implements FramebufferResource {
         return this.parent;
     }
 
-    public List<StaticFramebufferResource> getDependants() {
-        return this.dependants;
+    public StaticFramebufferResource getDependant() {
+        return this.dependant;
     }
 
     /**
@@ -51,7 +56,7 @@ public class StaticFramebufferResource implements FramebufferResource {
      */
     public void erase() {
         if(this.parent != null) {
-            this.parent.dependants.remove(this);
+            this.parent.dependant = null;
             this.parent = null;
         }
     }

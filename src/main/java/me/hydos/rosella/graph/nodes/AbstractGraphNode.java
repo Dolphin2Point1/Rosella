@@ -44,11 +44,6 @@ public abstract class AbstractGraphNode implements GraphNode {
     }
 
     @Override
-    public boolean isAnchor() {
-        return false;
-    }
-
-    @Override
     public void destroy() {
     }
 

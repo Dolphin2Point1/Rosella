@@ -90,7 +90,9 @@ public class OTSRenderGraph implements RenderGraph {
         private List<StaticBufferResource> bufferResources = null;
         private List<StaticImageResource> imageResources = null;
         private StaticFramebufferResource framebufferResource = null;
-        private int renderPassID = -1;
+
+        private boolean inRenderPass = false;
+        private OTSNodeMetadata renderPassParent = null;
 
         private Set<OTSNodeMetadata> parents = null;
 
@@ -164,9 +166,7 @@ public class OTSRenderGraph implements RenderGraph {
                 throw new IllegalStateException("A node cannot own more than 1 framebuffer resource");
             }
 
-            if(inRenderPass) {
-                this.renderPassID = OTSRenderGraph.this.nextRenderPass();
-            }
+            this.inRenderPass = inRenderPass;
 
             this.framebufferResource = new StaticFramebufferResource(OTSRenderGraph.this, spec);
             return this.framebufferResource;
@@ -186,11 +186,10 @@ public class OTSRenderGraph implements RenderGraph {
                 this.parents = new ObjectArraySet<>();
             }
 
+            this.inRenderPass = inRenderPass;
             if(inRenderPass) {
-                this.renderPassID = ((OTSFramebufferMeta) sSource.data).renderPassID;
-                if(this.renderPassID == -1) {
-                    this.renderPassID = OTSRenderGraph.this.nextRenderPass();
-                }
+                this.renderPassParent = ((OTSFramebufferMeta) sSource.data).node.getOTSMetadata();
+                this.parents.add(this.renderPassParent);
             }
 
             this.framebufferResource = new StaticFramebufferResource(OTSRenderGraph.this, sSource);
@@ -205,23 +204,48 @@ public class OTSRenderGraph implements RenderGraph {
                     throw new IllegalStateException("complete or abort has already been called");
                 }
 
-                final long rpMask = (1L >> this.renderPassID);
+                // Calculate render pass assignments
+                int renderPassID = -1;
+                int renderPassQueueFamilies = supportedQueueFamilies;
+                if(this.renderPassParent == null) {
+                    if(this.inRenderPass) {
+                        renderPassID = OTSRenderGraph.this.nextRenderPass();
+                    }
+                } else {
+                    renderPassID = this.renderPassParent.renderPassAssignment;
+                    renderPassQueueFamilies &= this.renderPassParent.renderPassQueueFamilies;
+                }
 
                 long renderPassDependencies = 0;
                 for(OTSNodeMetadata other : this.parents) {
                     renderPassDependencies |= other.renderPassDependencies;
                 }
-                if((rpMask & renderPassDependencies) != 0) {
-                    if(tryMergeRenderPass()) {
-                        renderPassDependencies &= ~rpMask;
+
+                if(this.renderPassParent != null) {
+                    if(renderPassQueueFamilies == 0) {
+                        // Cannot continue on the same queue family so we need to split
+                        renderPassID = OTSRenderGraph.this.nextRenderPass();
+                        renderPassQueueFamilies = supportedQueueFamilies;
+
                     } else {
-                        this.renderPassID = OTSRenderGraph.this.nextRenderPass();
+                        final long rpMask = (1L >> renderPassID);
+                        if((rpMask & renderPassDependencies) != 0) {
+                            // Dependency from outside the render pass, need to validate that we can merge
+                            renderPassQueueFamilies = tryMergeRenderPass(renderPassID, renderPassQueueFamilies);
+                            if(renderPassQueueFamilies != 0) {
+                                renderPassDependencies &= ~rpMask;
+                            } else {
+                                renderPassID = OTSRenderGraph.this.nextRenderPass();
+                                renderPassQueueFamilies = supportedQueueFamilies;
+                            }
+                        }
                     }
                 }
 
                 OTSNodeMetadata metadata = new OTSNodeMetadata(OTSRenderGraph.this, this.node, this.parents, supportedQueueFamilies);
-                metadata.renderPassAssignment = this.renderPassID;
+                metadata.renderPassAssignment = renderPassID;
                 metadata.renderPassDependencies = renderPassDependencies;
+                metadata.renderPassQueueFamilies = renderPassQueueFamilies;
 
                 this.node.setOTSMetadata(metadata);
 
@@ -270,15 +294,27 @@ public class OTSRenderGraph implements RenderGraph {
             }
         }
 
-        private boolean tryMergeRenderPass() {
-            final long rpMask = 1L >> this.renderPassID;
+        /**
+         * Attempts to merge all nodes that depend on the current render pass into the render pass.
+         *
+         * A breath first search is performed finding all nodes that need to be merged. If a node is part of another
+         * render pass, does not support execution inside a render pass or no single queue can support all nodes then
+         * the merger is aborted.
+         *
+         * The graph lock must be held before calling this function.
+         *
+         * @return The new queue limits or 0 if the merge failed.
+         */
+        private int tryMergeRenderPass(int renderPassID, int queueLimits) {
+            final long rpMask = 1L >> renderPassID;
             List<OTSNodeMetadata> nodes = OTSRenderGraph.this.tmpList;
             nodes.clear();
 
             for(OTSNodeMetadata parent : this.parents) {
                 if((parent.renderPassDependencies & rpMask) != 0) {
-                    if(parent.renderPassAssignment != -1 && parent.canRunInsideRenderPass) {
-                        return false;
+                    queueLimits &= parent.supportedQueueFamilies;
+                    if(queueLimits == 0 || cannotMergeWith(parent)) {
+                        return 0;
                     }
                     nodes.add(parent);
                 }
@@ -288,8 +324,9 @@ public class OTSRenderGraph implements RenderGraph {
             while(++current != nodes.size()) {
                 for(OTSNodeMetadata parent : nodes.get(current).parents) {
                     if((parent.renderPassDependencies & rpMask) != 0) {
-                        if(parent.renderPassAssignment != -1 && parent.canRunInsideRenderPass) {
-                            return false;
+                        queueLimits &= parent.supportedQueueFamilies;
+                        if(queueLimits == 0 || cannotMergeWith(parent)) {
+                            return 0;
                         }
                         nodes.add(parent);
                     }
@@ -297,11 +334,16 @@ public class OTSRenderGraph implements RenderGraph {
             }
 
             for(OTSNodeMetadata node : nodes) {
-                node.renderPassAssignment = this.renderPassID;
+                node.renderPassQueueFamilies = queueLimits;
+                node.renderPassAssignment = renderPassID;
                 node.renderPassDependencies &= ~rpMask;
             }
 
-            return true;
+            return queueLimits;
+        }
+
+        private static boolean cannotMergeWith(OTSNodeMetadata node) {
+            return (node.renderPassAssignment != -1) || !node.canRunInsideRenderPass;
         }
 
         /**

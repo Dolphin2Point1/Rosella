@@ -21,7 +21,8 @@ public class OTSNodeMetadata {
 
     public final int supportedQueueFamilies;
 
-    public long renderPassAssignment = -1;
+    public int renderPassQueueFamilies;
+    public int renderPassAssignment = -1;
 
     /**
      * A bitmask of all render passes that need to finish execution before this node can execute. If this node is part

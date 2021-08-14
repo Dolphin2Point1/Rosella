@@ -220,6 +220,9 @@ public class OTSRenderGraph implements RenderGraph {
                 }
 
                 OTSNodeMetadata metadata = new OTSNodeMetadata(OTSRenderGraph.this, this.node, this.parents, supportedQueueFamilies);
+                metadata.renderPassAssignment = this.renderPassID;
+                metadata.renderPassDependencies = renderPassDependencies;
+
                 this.node.setOTSMetadata(metadata);
 
                 if(this.bufferResources != null) {

@@ -51,18 +51,13 @@ public class OTSNodeMetadata {
             try {
                 graph.lock.lock();
 
-                long renderPasses = 0;
                 for (OTSNodeMetadata other : parents) {
-                    renderPasses |= other.renderPassDependencies;
                     this.unionMerge(other);
                 }
-                this.renderPassDependencies = renderPasses;
 
             } finally {
                 graph.lock.unlock();
             }
-        } else {
-            this.renderPassDependencies = 0;
         }
     }
 

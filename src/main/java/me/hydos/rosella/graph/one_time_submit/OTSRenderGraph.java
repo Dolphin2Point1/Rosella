@@ -7,6 +7,7 @@ import me.hydos.rosella.graph.resources.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -75,6 +76,8 @@ public class OTSRenderGraph implements RenderGraph {
         private List<StaticBufferResource> bufferResources = null;
         private List<StaticImageResource> imageResources = null;
         private StaticFramebufferResource framebufferResource = null;
+
+        private Set<OTSNodeMetadata> parents;
 
         public NodeConfigurator(OTSNode node) {
             this.node = node;
@@ -157,14 +160,14 @@ public class OTSRenderGraph implements RenderGraph {
         }
 
         @Override
-        public void complete(int queueFlags) {
+        public void complete(boolean anchor, int queueFlags) {
             try {
                 OTSRenderGraph.this.lock.lock();
                 if(this.node == null) {
                     throw new IllegalStateException("complete or abort has already been called");
                 }
 
-                OTSNodeMetadata metadata = new OTSNodeMetadata(this.node);
+                OTSNodeMetadata metadata = new OTSNodeMetadata(this.node, this.parents);
 
                 if(this.bufferResources != null) {
                     for(StaticBufferResource buffer : this.bufferResources) {

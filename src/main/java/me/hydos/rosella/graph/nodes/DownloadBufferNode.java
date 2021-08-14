@@ -16,12 +16,17 @@ public class DownloadBufferNode extends AbstractGraphNode implements OTSNode {
     private OTSNodeMetadata otsMetadata = null;
 
     private final List<BufferCopyRegion> copyRegions;
+    private final long minDstBufferSize;
 
     public final BufferResource result;
 
     public DownloadBufferNode(OTSRenderGraph graph, BufferResource srcBuffer, BufferCopyRegion copyRegion) {
         super(graph);
 
+        if(srcBuffer.getBufferSize() < copyRegion.srcOffset() + copyRegion.size()) {
+            throw new IllegalArgumentException("Copy region extend beyond source buffer size");
+        }
+        this.minDstBufferSize = copyRegion.dstOffset() + copyRegion.size();
         this.copyRegions = List.of(copyRegion);
 
         NodeConfigurator config = graph.addNode(this);
@@ -30,7 +35,7 @@ public class DownloadBufferNode extends AbstractGraphNode implements OTSNode {
                 VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK10.VK_ACCESS_TRANSFER_READ_BIT,
                 VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
-        config.complete(0); // TODO select queues
+        config.complete(true, 0); // TODO select queues
     }
 
     public DownloadBufferNode(OTSRenderGraph graph, BufferResource srcBuffer, List<BufferCopyRegion> copyRegions) {
@@ -39,6 +44,23 @@ public class DownloadBufferNode extends AbstractGraphNode implements OTSNode {
         if(copyRegions.isEmpty()) {
             throw new IllegalArgumentException("Copy regions list is empty");
         }
+        long minSrc = 0;
+        long minDst = 0;
+        for(BufferCopyRegion region : copyRegions) {
+            long rMinSrc = region.srcOffset() + region.size();
+            long rMinDst = region.dstOffset() + region.size();
+
+            if(minSrc < rMinSrc) {
+                minSrc = rMinSrc;
+            }
+            if(minDst < rMinDst) {
+                minDst = rMinDst;
+            }
+        }
+        if(srcBuffer.getBufferSize() < minSrc) {
+            throw new IllegalArgumentException("Copy regions extend beyond source buffer size");
+        }
+        this.minDstBufferSize = minDst;
         this.copyRegions = new ObjectArrayList<>(copyRegions);
 
         NodeConfigurator config = graph.addNode(this);
@@ -47,7 +69,7 @@ public class DownloadBufferNode extends AbstractGraphNode implements OTSNode {
                 VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK10.VK_ACCESS_TRANSFER_READ_BIT,
                 VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
-        config.complete(0); // TODO select queues
+        config.complete(true, 0); // TODO select queues
     }
 
     @Override

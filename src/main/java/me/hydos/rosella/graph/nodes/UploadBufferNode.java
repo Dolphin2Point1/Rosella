@@ -14,12 +14,17 @@ public class UploadBufferNode extends AbstractGraphNode implements OTSNode {
     private OTSNodeMetadata otsMetadata = null;
 
     private final List<BufferCopyRegion> copyRegions;
+    private final long minSrcBufferSize;
 
     public final BufferResource result;
 
     public UploadBufferNode(OTSRenderGraph graph, BufferResource dstBuffer, BufferCopyRegion copyRegion) {
         super(graph);
 
+        if(dstBuffer.getBufferSize() < copyRegion.dstOffset() + copyRegion.size()) {
+            throw new IllegalArgumentException("Copy region extend beyond destination buffer size");
+        }
+        this.minSrcBufferSize = copyRegion.srcOffset() + copyRegion.size();
         this.copyRegions = List.of(copyRegion);
 
         OTSNode.NodeConfigurator config = graph.addNode(this);
@@ -28,7 +33,7 @@ public class UploadBufferNode extends AbstractGraphNode implements OTSNode {
                 VK10.VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK10.VK_ACCESS_TRANSFER_WRITE_BIT,
                 VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
-        config.complete(0); // TODO: select all queues
+        config.complete(false, 0); // TODO: select all queues
     }
 
     public UploadBufferNode(OTSRenderGraph graph, BufferResource dstBuffer, List<BufferCopyRegion> copyRegions) {
@@ -37,6 +42,23 @@ public class UploadBufferNode extends AbstractGraphNode implements OTSNode {
         if(copyRegions.isEmpty()) {
             throw new IllegalArgumentException("Copy regions list is empty");
         }
+        long minSrc = 0;
+        long minDst = 0;
+        for(BufferCopyRegion region : copyRegions) {
+            long rMinSrc = region.srcOffset() + region.size();
+            long rMinDst = region.dstOffset() + region.size();
+
+            if(minSrc < rMinSrc) {
+                minSrc = rMinSrc;
+            }
+            if(minDst < rMinDst) {
+                minDst = rMinDst;
+            }
+        }
+        if(dstBuffer.getBufferSize() < minDst) {
+            throw new IllegalArgumentException("Copy regions extend beyond destination buffer size");
+        }
+        this.minSrcBufferSize = minSrc;
         this.copyRegions = new ObjectArrayList<>(copyRegions);
 
         OTSNode.NodeConfigurator config = graph.addNode(this);
@@ -45,7 +67,7 @@ public class UploadBufferNode extends AbstractGraphNode implements OTSNode {
                 VK10.VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK10.VK_ACCESS_TRANSFER_WRITE_BIT,
                 VK10.VK_PIPELINE_STAGE_TRANSFER_BIT);
-        config.complete(0); // TODO: select all queues
+        config.complete(false, 0); // TODO: select all queues
     }
 
     @Override

@@ -1,6 +1,5 @@
 package me.hydos.rosella.graph.nodes;
 
-import me.hydos.rosella.graph.RenderGraph;
 import me.hydos.rosella.graph.one_time_submit.OTSNode;
 import me.hydos.rosella.graph.one_time_submit.OTSNodeMetadata;
 import me.hydos.rosella.graph.one_time_submit.OTSRenderGraph;
@@ -18,7 +17,7 @@ public class CreateBufferNode extends AbstractGraphNode implements OTSNode {
 
         OTSNode.NodeConfigurator config = graph.addNode(this);
         this.buffer = config.createBufferResource(bufferSize, ResourceAccess.NONE, 0, 0, 0);
-        config.complete(0);
+        config.complete(false, 0);
     }
 
     public BufferResource getBuffer() {

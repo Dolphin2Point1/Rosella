@@ -32,7 +32,7 @@ public interface OTSNode extends GraphNode {
 
         FramebufferResource createFramebufferResource(FramebufferResource source);
 
-        void complete(int queueFlags);
+        void complete(boolean anchor, int queueFlags);
 
         void abort();
     }
